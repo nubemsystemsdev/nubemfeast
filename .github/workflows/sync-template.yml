@@ -23,12 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout current repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: repo
 
       - name: Checkout template
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: nubemsystemsdev/nubem-template
           path: template
