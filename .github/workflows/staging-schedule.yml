@@ -1,0 +1,83 @@
+# ==============================================================================
+# STAGING SCHEDULE
+# Activa staging L-V 7:00-18:30 (Europe/Madrid) para ahorrar recursos
+# ==============================================================================
+name: Staging Schedule
+
+on:
+  schedule:
+    # Activar: 7:00 L-V (5:00 UTC en invierno, 5:00 UTC en verano)
+    - cron: '0 5 * * 1-5'
+    # Desactivar: 18:30 L-V (16:30 UTC en invierno, 16:30 UTC en verano)
+    - cron: '30 16 * * 1-5'
+  
+  # Permite activar/desactivar manualmente
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Acción a realizar'
+        required: true
+        type: choice
+        options:
+          - start
+          - stop
+
+jobs:
+  manage-staging:
+    name: ${{ github.event.schedule == '0 5 * * 1-5' && '🌅 Start' || github.event.schedule == '30 16 * * 1-5' && '🌙 Stop' || inputs.action == 'start' && '🌅 Start' || '🌙 Stop' }} Staging
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY_STAGING }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Determine action
+        id: action
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "action=${{ inputs.action }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" == "0 5 * * 1-5" ]; then
+            echo "action=start" >> $GITHUB_OUTPUT
+          else
+            echo "action=stop" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Start staging
+        if: steps.action.outputs.action == 'start'
+        run: |
+          echo "🌅 Activando staging..."
+          gcloud run services update ${{ github.event.repository.name }}-staging \
+            --region=${{ vars.GCP_REGION }} \
+            --min-instances=1 \
+            --max-instances=3
+          echo "✅ Staging activado"
+
+      - name: Stop staging
+        if: steps.action.outputs.action == 'stop'
+        run: |
+          echo "🌙 Desactivando staging..."
+          gcloud run services update ${{ github.event.repository.name }}-staging \
+            --region=${{ vars.GCP_REGION }} \
+            --min-instances=0 \
+            --max-instances=0
+          echo "✅ Staging desactivado"
+
+      - name: Summary
+        run: |
+          ACTION="${{ steps.action.outputs.action }}"
+          if [ "$ACTION" == "start" ]; then
+            echo "## 🌅 Staging Activado" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Servicio disponible hasta las 18:30" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## 🌙 Staging Desactivado" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Se reactivará mañana a las 7:00 (L-V)" >> $GITHUB_STEP_SUMMARY
+          fi
