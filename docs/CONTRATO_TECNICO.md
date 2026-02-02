@@ -1,4 +1,4 @@
-# Contrato Técnico del Proyecto
+# Contrato Técnico - NubemFeast
 
 > **IMPORTANTE**: Este documento es la FUENTE DE VERDAD para todos los agentes.
 > Cualquier decisión técnica que contradiga este documento debe generar un SPEC_UPDATE_REQUEST.
@@ -17,51 +17,6 @@ Este proyecto utiliza dos archivos complementarios que trabajan juntos para guia
 | **CLAUDE.md** | Instrucciones operativas para Claude Code | Cómo trabajar, comandos, workflows, reglas de sesión | Claude Code CLI |
 | **CONTRATO_TECNICO.md** | Especificaciones técnicas del proyecto | Arquitectura, stack, decisiones, convenciones | Agentes y humanos |
 
-### CLAUDE.md (Instrucciones Operativas)
-
-**Ubicación:** Raíz del proyecto (`./CLAUDE.md`)
-
-**Contenido recomendado:**
-- Comandos Bash específicos del proyecto
-- Workflows de desarrollo (testing, linting, build)
-- Reglas de comportamiento para Claude Code
-- Referencias a documentación (`@docs/CONTRATO_TECNICO.md`)
-- Instrucciones de sesión y contexto
-
-**Ejemplo de estructura:**
-```markdown
-# CLAUDE.md - [Nombre del Proyecto]
-
-## Contexto del Proyecto
-@docs/CONTRATO_TECNICO.md
-
-## Comandos de Desarrollo
-- Tests: `npm test` / `pytest`
-- Lint: `npm run lint` / `ruff check`
-- Build: `npm run build`
-
-## Reglas de Sesión
-- Siempre verificar rama antes de escribir código
-- Actualizar docs/historico_commits.md con cada commit
-- Consultar CONTRATO_TECNICO.md antes de decisiones arquitectónicas
-
-## Workflow Git
-- Nunca push directo a main/staging
-- Crear PR para todo cambio
-- Commits en español, formato conventional commits
-```
-
-### CONTRATO_TECNICO.md (Fuente de Verdad Técnica)
-
-**Ubicación:** `docs/CONTRATO_TECNICO.md`
-
-**Contenido:**
-- Stack tecnológico y justificaciones
-- Arquitectura y patrones
-- Convenciones de código
-- Configuración de CI/CD
-- Restricciones y constraints
-
 ### Jerarquía de Precedencia
 
 ```
@@ -71,233 +26,397 @@ Este proyecto utiliza dos archivos complementarios que trabajan juntos para guia
 4. Convenciones deducidas del código (MÍNIMA)
 ```
 
-### Flujo de Trabajo Conjunto
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    INICIO DE SESIÓN                         │
-├─────────────────────────────────────────────────────────────┤
-│  1. Claude Code carga CLAUDE.md automáticamente             │
-│  2. CLAUDE.md referencia @docs/CONTRATO_TECNICO.md          │
-│  3. Claude tiene contexto operativo + técnico               │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    DURANTE DESARROLLO                       │
-├─────────────────────────────────────────────────────────────┤
-│  • Decisión operativa (cómo ejecutar) → CLAUDE.md           │
-│  • Decisión técnica (qué arquitectura) → CONTRATO_TECNICO   │
-│  • Conflicto entre ambos → Prevalece CONTRATO_TECNICO       │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    AL HACER COMMIT                          │
-├─────────────────────────────────────────────────────────────┤
-│  1. Actualizar docs/historico_commits.md (obligatorio)      │
-│  2. Si hay cambio arquitectónico → Actualizar CONTRATO      │
-│  3. Si hay nuevo comando/workflow → Actualizar CLAUDE.md    │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Creación Obligatoria
-
-> **CRÍTICO**: Todo proyecto Nubemsystems DEBE tener ambos archivos:
-> - `./CLAUDE.md` → Creado en la inicialización del proyecto
-> - `docs/CONTRATO_TECNICO.md` → Creado en la inicialización del proyecto
-
 ---
 
 ## Metadata
 
 | Campo | Valor |
 |-------|-------|
-| **Nombre del proyecto** | [A rellenar] |
-| **Descripción** | [A rellenar] |
+| **Nombre del proyecto** | NubemFeast |
+| **Descripción** | Sistema de Accesibilidad para Sillas de Ruedas |
 | **Versión del contrato** | 1.0.0 |
-| **Fecha de creación** | [Fecha ISO] |
-| **Última actualización** | [Fecha ISO] |
-| **Actualizado por** | [agent_id o human] |
+| **Fecha de creación** | 2026-02-02 |
+| **Última actualización** | 2026-02-02 |
+| **Actualizado por** | architect-agent |
 
 ---
 
-## Stack Tecnológico
+## 1. Descripción del Proyecto
 
-### Backend
+**NubemFeast** es un POC que analiza fotos 2D de espacios (museos, edificios) y genera guías de navegación visual para personas en silla de ruedas, con interfaz tipo "recorrido virtual".
 
-| Aspecto | Decisión | Justificación |
-|---------|----------|---------------|
-| **Lenguaje** | [Ej: Python 3.11] | [Por qué se eligió] |
-| **Framework** | [Ej: FastAPI] | [Por qué se eligió] |
-| **ORM/DB Client** | [Ej: SQLAlchemy 2.0] | [Por qué se eligió] |
-| **Validación** | [Ej: Pydantic v2] | [Por qué se eligió] |
+### 1.1 Funcionalidades Principales
 
-### Base de Datos
-
-| Aspecto | Decisión | Justificación |
-|---------|----------|---------------|
-| **Motor** | [Ej: PostgreSQL 15] | [Por qué se eligió] |
-| **Migraciones** | [Ej: Alembic] | [Por qué se eligió] |
-| **Naming convention** | [Ej: snake_case, tablas en plural] | [Por qué se eligió] |
-
-### Frontend (si aplica)
-
-| Aspecto | Decisión | Justificación |
-|---------|----------|---------------|
-| **Framework** | [Ej: React 18] | [Por qué se eligió] |
-| **State management** | [Ej: Zustand] | [Por qué se eligió] |
-| **Styling** | [Ej: Tailwind CSS] | [Por qué se eligió] |
-| **HTTP Client** | [Ej: axios] | [Por qué se eligió] |
-
-### Infraestructura
-
-| Aspecto | Decisión | Justificación |
-|---------|----------|---------------|
-| **Cloud provider** | [Ej: AWS] | [Por qué se eligió] |
-| **Compute** | [Ej: Lambda + API Gateway] | [Por qué se eligió] |
-| **Database hosting** | [Ej: RDS PostgreSQL] | [Por qué se eligió] |
-| **CI/CD** | [Ej: GitHub Actions] | [Por qué se eligió] |
+1. **Subir fotos de recorrido**: Permite cargar múltiples imágenes de un espacio
+2. **Análisis con Vision AI**: Detecta barreras de accesibilidad (puertas estrechas, escalones, obstáculos)
+3. **Modelo de mundo**: Crea grafo de espacios conectados usando NetworkX
+4. **Guía personalizada**: Genera recomendaciones según perfil de silla de ruedas
+5. **Recorrido virtual**: Presenta navegación interactiva con alertas visuales
 
 ---
 
-## Dependencias Principales
+## 2. Stack Tecnológico
 
-> Solo listar dependencias que definen la arquitectura. Dependencias auxiliares no requieren estar aquí.
+### 2.1 Backend
+
+| Aspecto | Decisión | Versión | Justificación |
+|---------|----------|---------|---------------|
+| **Lenguaje** | Python | 3.11 | Ecosistema maduro para AI/ML, integración nativa con OpenAI |
+| **Framework** | FastAPI | 0.109.0 | Async nativo, validación con Pydantic, OpenAPI automático |
+| **ORM** | SQLModel | 0.0.14 | Combina SQLAlchemy + Pydantic, reduce boilerplate |
+| **Validación** | Pydantic | v2 | Performance mejorada, integrado con FastAPI |
+| **Server** | Uvicorn | 0.27.0 | ASGI server de alto rendimiento |
+
+### 2.2 Base de Datos
+
+| Aspecto | Decisión | Justificación |
+|---------|----------|---------------|
+| **Motor (Desarrollo)** | SQLite | Desarrollo rápido, sin configuración |
+| **Motor (Producción)** | PostgreSQL | Escalabilidad, concurrencia |
+| **Migraciones** | Alembic | Estándar para SQLAlchemy/SQLModel |
+| **Naming convention** | snake_case, tablas en plural | Convención Python estándar |
+
+### 2.3 Frontend
+
+| Aspecto | Decisión | Versión | Justificación |
+|---------|----------|---------|---------------|
+| **Framework** | React | 18.2.0 | Fast refresh, ecosistema maduro |
+| **Build Tool** | Vite | 5.0.0 | Build optimizado, TypeScript nativo |
+| **State** | TanStack Query | 5.17.0 | Cache de API, sincronización servidor-cliente |
+| **Styling** | Tailwind CSS | 3.4.0 | Utility-first, rápido para prototipar |
+| **HTTP Client** | Axios | 1.6.0 | Interceptors, manejo de errores consistente |
+| **Animaciones** | Framer Motion | 11.0.0 | Transiciones suaves para recorrido virtual |
+| **Lenguaje** | TypeScript | 5.3.0 | Type safety |
+
+### 2.4 Infraestructura
+
+| Aspecto | Decisión | Justificación |
+|---------|----------|---------------|
+| **Cloud Provider** | Google Cloud | Infraestructura existente nubemsystems |
+| **Compute** | Cloud Run | Escalado automático, pay-per-use |
+| **Registry** | Artifact Registry | Integración nativa GCP |
+| **CI/CD** | GitHub Actions | Estándar de la metodología |
+
+### 2.5 Servicios Externos
+
+| Servicio | Proveedor | Uso |
+|----------|-----------|-----|
+| Vision AI | OpenAI GPT-4o Vision | Análisis de imágenes |
+| Backup Vision | Google Gemini 1.5 Pro | Alternativa menor costo |
+
+---
+
+## 3. Dependencias Principales
 
 ### Backend
 
 ```
-# Formato: nombre==versión - propósito
-fastapi==0.109.0 - Framework web
-sqlalchemy==2.0.25 - ORM
-pydantic==2.5.3 - Validación y serialización
-alembic==1.13.1 - Migraciones de DB
-python-jose==3.3.0 - JWT handling
-passlib==1.7.4 - Password hashing
+# Framework web
+fastapi==0.109.0 - Framework web async
+uvicorn[standard]==0.27.0 - ASGI server
+python-multipart==0.0.6 - File uploads
+
+# AI/Vision
+openai==1.12.0 - GPT-4 Vision integration
+
+# Base de datos
+sqlmodel==0.0.14 - ORM (SQLAlchemy + Pydantic)
+aiosqlite==0.19.0 - SQLite async (POC)
+alembic==1.13.1 - Migraciones
+
+# Modelo de mundo
+networkx==3.2.1 - Grafos para representar espacios
+
+# Imágenes
+Pillow==10.2.0 - Procesamiento de imágenes
+
+# Utilidades
+pydantic-settings==2.1.0 - Configuración
+python-dotenv==1.0.0 - Variables de entorno
+httpx==0.26.0 - HTTP client async
+aiofiles==23.2.1 - File I/O async
+
+# Testing
+pytest==8.0.0
+pytest-asyncio==0.23.0
+pytest-cov==4.1.0
+
+# Code quality
+black==24.1.0 - Formatter
+ruff==0.2.0 - Linter
+mypy==1.8.0 - Type checking
 ```
 
 ### Frontend
 
 ```
-# Formato: nombre@versión - propósito
+# Core
 react@18.2.0 - UI framework
-zustand@4.5.0 - State management
-axios@1.6.5 - HTTP client
-tailwindcss@3.4.1 - Styling
+react-dom@18.2.0 - React DOM
+react-router-dom@6.22.0 - Routing
+
+# Data fetching
+@tanstack/react-query@5.17.0 - Server state management
+axios@1.6.0 - HTTP client
+
+# UI
+tailwindcss@3.4.0 - Styling
+framer-motion@11.0.0 - Animaciones
+lucide-react@0.300.0 - Iconos
+
+# Utilities
+clsx@2.1.0 - Class names
+tailwind-merge@2.2.0 - Merge Tailwind classes
+
+# Dev
+vite@5.0.0 - Build tool
+typescript@5.3.0 - Type safety
+@types/react@18.2.0 - React types
+vitest@1.2.0 - Testing
+@testing-library/react@14.1.0 - React testing
 ```
 
 ---
 
-## Arquitectura
+## 4. Arquitectura
 
-### Patrón Elegido
+### 4.1 Patrón Arquitectónico
 
-**Patrón:** [Ej: Arquitectura en Capas / Hexagonal / DDD simplificado]
+**Patrón:** Arquitectura en Capas + Repository Pattern
 
-**Justificación:** 
-[Explicar por qué este patrón es apropiado para el proyecto. Mínimo 2-3 líneas.]
-
-### Estructura de Carpetas
+**Justificación:**
+Para un POC, una arquitectura en capas proporciona separación clara de responsabilidades sin la complejidad de DDD o Hexagonal. El Repository Pattern permite abstraer el acceso a datos y facilitar testing. Esta arquitectura es suficientemente simple para iterar rápido pero estructurada para escalar si el POC tiene éxito.
 
 ```
-/backend
-├── /src
-│   ├── /api            # Endpoints FastAPI (routers)
-│   ├── /core           # Configuración, dependencias, seguridad
-│   ├── /models         # Modelos SQLAlchemy
-│   ├── /schemas        # Schemas Pydantic (request/response)
-│   ├── /services       # Lógica de negocio
-│   └── /repositories   # Acceso a datos (si se usa Repository pattern)
-├── /tests
-│   ├── /unit
-│   └── /integration
-├── /alembic            # Migraciones
-└── pyproject.toml
-
-/frontend
-├── /src
-│   ├── /components     # Componentes React reutilizables
-│   ├── /pages          # Componentes de página/vista
-│   ├── /hooks          # Custom hooks
-│   ├── /services       # Llamadas API
-│   ├── /store          # Estado global (Zustand)
-│   └── /utils          # Utilidades
-├── /tests
-└── package.json
-
-/infrastructure
-├── /terraform          # IaC (si aplica)
-└── /.github/workflows  # CI/CD pipelines
-
-/specs                  # FUENTE DE VERDAD - NO CÓDIGO
-├── CONTRATO_TECNICO.md
-├── DATA_MODELS.md
-├── ARCHITECTURE_DECISIONS.md
-├── TASK_HISTORY.md
-├── /api_contracts
-│   └── *.yaml
-└── /pending_updates
-    └── *.yaml
+┌─────────────────────────────────────────┐
+│              API Layer                   │
+│         (FastAPI Routers)               │
+├─────────────────────────────────────────┤
+│            Service Layer                 │
+│    (Lógica de negocio, Vision AI)       │
+├─────────────────────────────────────────┤
+│          Repository Layer                │
+│      (Abstracción acceso a datos)       │
+├─────────────────────────────────────────┤
+│             Data Layer                   │
+│    (SQLModel + SQLite/PostgreSQL)       │
+└─────────────────────────────────────────┘
 ```
 
-### Patrones Obligatorios
+### 4.2 Estructura de Carpetas
+
+```
+nubemfeast/
+│
+├── /docs                               # DOCUMENTACIÓN Y ESPECIFICACIONES
+│   ├── CONTRATO_TECNICO.md             # Fuente de verdad técnica
+│   ├── DATA_MODELS.md                  # Especificación de entidades
+│   ├── ARCHITECTURE_DECISIONS.md       # Log de decisiones arquitectónicas
+│   ├── TASK_HISTORY.md                 # Historial de tareas
+│   ├── historico_commits.md            # Historial detallado de commits
+│   ├── /api_contracts                  # Contratos OpenAPI
+│   │   ├── scans.yaml
+│   │   ├── analysis.yaml
+│   │   └── navigation.yaml
+│   ├── /agents                         # Documentación de agentes
+│   └── /prompts                        # Prompts de metodología
+│
+├── /backend
+│   ├── /src
+│   │   ├── /api                        # Endpoints FastAPI (routers)
+│   │   │   ├── __init__.py
+│   │   │   ├── scans.py
+│   │   │   ├── analysis.py
+│   │   │   └── navigation.py
+│   │   │
+│   │   ├── /core                       # Configuración, dependencias
+│   │   │   ├── __init__.py
+│   │   │   ├── config.py
+│   │   │   ├── database.py
+│   │   │   └── dependencies.py
+│   │   │
+│   │   ├── /models                     # Modelos SQLModel
+│   │   │   ├── __init__.py
+│   │   │   ├── scan.py
+│   │   │   ├── image.py
+│   │   │   └── guide.py
+│   │   │
+│   │   ├── /schemas                    # Schemas Pydantic (request/response)
+│   │   │   ├── __init__.py
+│   │   │   ├── scan.py
+│   │   │   ├── analysis.py
+│   │   │   ├── navigation.py
+│   │   │   └── enums.py
+│   │   │
+│   │   ├── /services                   # Lógica de negocio
+│   │   │   ├── __init__.py
+│   │   │   ├── scan_service.py
+│   │   │   ├── vision_service.py       # Integración Vision AI
+│   │   │   ├── world_model_service.py  # Grafo NetworkX
+│   │   │   └── guide_service.py
+│   │   │
+│   │   ├── /repositories               # Acceso a datos
+│   │   │   ├── __init__.py
+│   │   │   ├── scan_repository.py
+│   │   │   └── image_repository.py
+│   │   │
+│   │   └── main.py
+│   │
+│   ├── /tests
+│   │   ├── /unit
+│   │   └── /integration
+│   │
+│   ├── /alembic
+│   ├── requirements.txt
+│   ├── pyproject.toml
+│   └── Dockerfile
+│
+├── /frontend
+│   ├── /src
+│   │   ├── /components
+│   │   │   ├── /Layout
+│   │   │   ├── /VirtualTour            # Componente principal recorrido
+│   │   │   ├── /Upload
+│   │   │   ├── /Accessibility
+│   │   │   └── /Summary
+│   │   │
+│   │   ├── /pages
+│   │   ├── /hooks
+│   │   ├── /services
+│   │   ├── /store
+│   │   ├── /types
+│   │   └── /utils
+│   │
+│   ├── /tests
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── tsconfig.json
+│   ├── tailwind.config.js
+│   └── Dockerfile
+│
+├── /.github
+│   └── /workflows
+│       ├── ci.yml
+│       ├── deploy-staging.yml
+│       └── deploy-production.yml
+│
+├── docker-compose.yml
+├── CLAUDE.md
+├── .env.example
+└── README.md
+```
+
+### 4.3 Flujo de Datos Principal
+
+```
+1. Usuario sube imágenes → POST /api/scans
+2. Backend almacena imágenes → Upload Service
+3. Análisis Vision AI → Vision Service (GPT-4o)
+4. Construcción modelo mundo → World Model Service (NetworkX)
+5. Generación guía → Guide Service
+6. Presentación recorrido → Frontend Virtual Tour
+```
+
+### 4.4 Patrones Obligatorios
 
 | Patrón | Dónde Aplicar | Ejemplo |
 |--------|---------------|---------|
 | Dependency Injection | Servicios en endpoints | `Depends(get_db)` |
-| Repository Pattern | Acceso a datos | `UserRepository.get_by_id()` |
+| Repository Pattern | Acceso a datos | `ScanRepository.get_by_id()` |
 | DTO/Schema separation | API boundaries | Pydantic schemas separados de models |
-| [Añadir más según proyecto] | | |
 
-### Patrones Prohibidos
+### 4.5 Patrones Prohibidos
 
 | Patrón | Razón |
 |--------|-------|
 | God classes | Viola Single Responsibility |
 | Hardcoded configuration | Dificulta deployment |
 | Direct SQL in controllers | Viola separación de capas |
-| [Añadir más según proyecto] | |
 
 ---
 
-## Convenciones de Código
+## 5. Endpoints API
 
-### Python
+### 5.1 Scans
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/api/scans` | Crear nuevo scan |
+| GET | `/api/scans` | Listar scans |
+| GET | `/api/scans/{id}` | Obtener scan |
+| DELETE | `/api/scans/{id}` | Eliminar scan |
+| POST | `/api/scans/{id}/images` | Subir imágenes |
+
+### 5.2 Analysis
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/api/scans/{id}/analyze` | Iniciar análisis |
+| GET | `/api/scans/{id}/analysis` | Obtener resultado análisis |
+
+### 5.3 Navigation
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/scans/{id}/guide` | Obtener guía navegación |
+| GET | `/api/scans/{id}/world-model` | Obtener modelo de mundo |
+
+---
+
+## 6. Modelos de Datos
+
+Ver `docs/DATA_MODELS.md` para especificación completa.
+
+### 6.1 Entidades Principales
+
+- **Scan**: Representa un escaneo/recorrido de un espacio
+- **Image**: Imagen individual dentro de un scan
+- **AnalysisResult**: Resultado del análisis de accesibilidad
+- **Barrier**: Barrera de accesibilidad detectada
+- **Guide**: Guía de navegación generada
+- **WheelchairProfile**: Perfil de silla de ruedas del usuario
+
+---
+
+## 7. Convenciones de Código
+
+### 7.1 Backend (Python)
 
 | Aspecto | Convención |
 |---------|------------|
-| **Formatter** | black (line-length=88) |
-| **Linter** | ruff |
+| **Formatter** | Black (line-length: 88) |
+| **Linter** | Ruff |
+| **Type checker** | mypy (strict mode) |
 | **Naming: funciones/variables** | snake_case |
 | **Naming: clases** | PascalCase |
 | **Naming: constantes** | UPPER_SNAKE_CASE |
+| **Docstrings** | Google style |
 | **Type hints** | Obligatorios en funciones públicas |
-| **Docstrings** | Google style, obligatorios en funciones públicas |
 
-### TypeScript/JavaScript
+### 7.2 Frontend (TypeScript)
 
 | Aspecto | Convención |
 |---------|------------|
-| **Formatter** | prettier |
-| **Linter** | eslint |
+| **Formatter** | Prettier |
+| **Linter** | ESLint con config React |
+| **Naming: componentes** | PascalCase |
 | **Naming: funciones/variables** | camelCase |
-| **Naming: componentes React** | PascalCase |
 | **Naming: constantes** | UPPER_SNAKE_CASE |
 | **Types** | TypeScript strict mode |
+| **Archivos componentes** | PascalCase.tsx |
 
-### Base de Datos
+### 7.3 Base de Datos
 
 | Aspecto | Convención |
 |---------|------------|
-| **Tablas** | snake_case, plural (users, expenses) |
-| **Columnas** | snake_case (created_at, user_id) |
-| **Primary keys** | id (UUID preferido) |
-| **Foreign keys** | {tabla_singular}_id (user_id) |
+| **Tablas** | snake_case, plural (scans, images) |
+| **Columnas** | snake_case (created_at, scan_id) |
+| **Primary keys** | id (UUID) |
+| **Foreign keys** | {tabla_singular}_id (scan_id) |
 | **Índices** | idx_{tabla}_{columnas} |
 | **Timestamps** | created_at, updated_at en todas las tablas |
 
-### Commits
+### 7.4 Commits
 
 Conventional Commits obligatorio:
 
@@ -312,9 +431,9 @@ chore: mantenimiento (deps, config)
 
 Formato: `tipo(scope): descripción breve`
 
-Ejemplo: `feat(expenses): add category filtering endpoint`
+Ejemplo: `feat(scans): add image upload endpoint`
 
-### Histórico de Commits (OBLIGATORIO)
+### 7.5 Histórico de Commits (OBLIGATORIO)
 
 > **CRÍTICO**: Todo commit debe documentarse en `docs/historico_commits.md` de forma simultánea.
 
@@ -325,143 +444,91 @@ Ejemplo: `feat(expenses): add category filtering endpoint`
 | **Cuándo actualizar** | En el mismo momento que se hace el commit |
 | **Quién actualiza** | El autor del commit (agente o humano) |
 
-#### Formato de Entrada
-
-```markdown
-## Commit [número]: "[tipo]: descripción corta" - DD/MM/YYYY
-
-[Descripción detallada de los cambios realizados. Incluir:]
-- Qué archivos se modificaron/crearon
-- Por qué se hicieron los cambios
-- Impacto en el sistema
-- Referencias a issues/PRs si aplica
-
----
-```
-
-#### Ejemplo
-
-```markdown
-## Commit 24: "feat(auth): implementa autenticación JWT" - 26/01/2026
-
-Se ha implementado el sistema de autenticación basado en JWT:
-- Creados endpoints `/auth/login` y `/auth/refresh`
-- Añadido middleware de verificación de tokens
-- Configuradas variables de entorno para secrets
-- Tests unitarios para el servicio de autenticación
-
-Archivos afectados:
-- `src/api/auth.py` (nuevo)
-- `src/core/security.py` (nuevo)
-- `src/core/dependencies.py` (modificado)
-- `tests/unit/test_auth.py` (nuevo)
-
----
-```
-
-#### Flujo de Trabajo
-
-```
-1. Realizar cambios en el código
-2. Actualizar docs/historico_commits.md (añadir entrada arriba)
-3. git add [archivos] docs/historico_commits.md
-4. git commit -m "tipo(scope): descripción"
-```
-
-> ⚠️ **BLOQUEO**: No se permite hacer commit sin actualizar el histórico. Los agentes deben verificar esto automáticamente.
-
 ---
 
-## Testing
+## 8. Testing
 
-### Configuración
-
-| Aspecto | Valor |
-|---------|-------|
-| **Framework backend** | pytest |
+| Aspecto | Especificación |
+|---------|----------------|
+| **Framework backend** | pytest + pytest-asyncio |
 | **Framework frontend** | vitest + testing-library |
 | **Cobertura mínima** | 80% |
 | **CI blocking** | Tests deben pasar para merge |
 
-### Tipos de Tests Requeridos
+### 8.1 Tests Requeridos
 
 | Tipo | Cuándo es Obligatorio | Ubicación |
 |------|----------------------|-----------|
-| **Unitarios** | Toda lógica de negocio en services | /tests/unit |
+| **Unitarios** | vision_service, world_model_service, guide_service | /tests/unit |
 | **Integración** | Endpoints de API | /tests/integration |
-| **E2E** | Flujos críticos (auth, checkout) | /tests/e2e |
+| **E2E** | Flujo completo upload → análisis → guía | /tests/e2e |
 
-### Convenciones de Tests
+### 8.2 Convenciones de Tests
 
 ```python
 # Naming: test_{función}_{escenario}_{resultado_esperado}
-def test_create_expense_valid_data_returns_201():
+def test_analyze_image_valid_data_returns_barriers():
     ...
 
-def test_create_expense_negative_amount_returns_400():
+def test_analyze_image_invalid_format_returns_400():
     ...
 ```
 
 ---
 
-## Seguridad
-
-### Autenticación
-
-| Aspecto | Decisión |
-|---------|----------|
-| **Método** | JWT |
-| **Almacenamiento** | httpOnly cookies |
-| **Expiración access token** | [Ej: 15 min] |
-| **Expiración refresh token** | [Ej: 7 días] |
-| **Refresh strategy** | Automatic con interceptor |
-
-### Secretos y Configuración
-
-| Regla | Descripción |
-|-------|-------------|
-| **NUNCA hardcodear** | Credenciales, API keys, tokens, URLs de DB |
-| **Variables de entorno** | Toda configuración sensible |
-| **Naming de env vars** | UPPER_SNAKE_CASE, prefijo por servicio |
-| **Ejemplo** | `DATABASE_URL`, `JWT_SECRET`, `AWS_ACCESS_KEY_ID` |
-
-### Variables de Entorno Requeridas
+## 9. Variables de Entorno
 
 ```bash
 # Backend
-DATABASE_URL=postgresql://...
-JWT_SECRET=...
-JWT_ALGORITHM=HS256
+DATABASE_URL=sqlite+aiosqlite:///./data/nubemfeast.db
+OPENAI_API_KEY=sk-...
+UPLOAD_DIR=./data/uploads
+MAX_UPLOAD_SIZE_MB=10
+API_PORT=8002
 
-# AWS (si aplica)
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-AWS_REGION=...
+# Frontend
+VITE_API_URL=http://localhost:8002
 
-# [Añadir más según proyecto]
+# GCP (deployment)
+GCP_PROJECT_ID=nubemfeast
+GCP_REGION=europe-west1
+ARTIFACT_REGISTRY_REPO=nubemfeast
 ```
 
 ---
 
-## Flujo de Trabajo Git
+## 10. Constraints del Proyecto
 
-### Ramas
+| Constraint | Valor | Razón |
+|------------|-------|-------|
+| Presupuesto cloud | ~$50/mes | POC con recursos limitados |
+| Vision API calls | ~100/día | Costo de GPT-4V |
+| Max imágenes/scan | 20 | Limitar procesamiento |
+| Tamaño max imagen | 10MB | Performance upload |
+| Formatos imagen | JPEG, PNG, WebP | Compatibilidad Vision AI |
+
+---
+
+## 11. Git Workflow
+
+### 11.1 Ramas
 
 | Rama | Propósito | Protegida |
 |------|-----------|-----------|
 | `main` | Producción. Código desplegado. | ✅ |
-| `staging` | Integración. Deploy a staging. | ✅ |
+| `staging` | Pre-producción (default). Deploy a staging. | ✅ |
 | `feature/*` | Desarrollo de funcionalidades. | ❌ |
+| `fix/*` | Corrección de bugs. | ❌ |
 | `hotfix/*` | Correcciones urgentes en prod. | ❌ |
 
-### Protecciones
+### 11.2 Protecciones
 
 | Rama | Push Directo | PR Requerido | Aprobación | CI Requerido |
 |------|--------------|--------------|------------|--------------|
 | `main` | ❌ | ✅ | Manual (1+ persona) | ✅ |
 | `staging` | ❌ | ✅ | Auto (si CI pasa) | ✅ |
 
-### Flujo de Desarrollo Normal
+### 11.3 Flujo de Desarrollo Normal
 
 ```
 feature/xxx → PR → staging → validación → PR → main
@@ -469,119 +536,34 @@ feature/xxx → PR → staging → validación → PR → main
               (CI + deploy staging)    (deploy producción)
 ```
 
-### Flujo de Hotfix
+---
 
-```
-main → hotfix/xxx → PR → main → deploy prod → sync staging
-```
+## 12. Deployment
 
-1. Crear rama `hotfix/xxx` desde `main`
-2. Implementar corrección mínima
-3. PR directo a `main` (requiere aprobación manual urgente)
-4. Merge y deploy a producción
-5. Sincronizar `staging` con `main`
+### 12.1 Entornos
+
+| Entorno | URL | Trigger |
+|---------|-----|---------|
+| Staging | staging.nubemfeast.app | Push a staging |
+| Production | nubemfeast.app | Push a main |
+
+### 12.2 CI/CD Pipeline
+
+1. **ci.yml**: Lint, tests, spec-verify en PRs
+2. **deploy-staging.yml**: Build + deploy a Cloud Run staging
+3. **deploy-production.yml**: Build + deploy a Cloud Run producción
 
 ---
 
-## CI/CD
-
-### Pipeline de PR
-
-```yaml
-# Ejecuta en cada PR a staging o main
-steps:
-  - lint          # Verificar formato y estilo
-  - type-check    # Verificar tipos (mypy/tsc)
-  - test          # Ejecutar tests
-  - spec-verify   # Verificar consistencia con specs
-  - security-scan # Buscar vulnerabilidades
-```
-
-### Condiciones para Merge
-
-| Check | Requerido para staging | Requerido para main |
-|-------|----------------------|---------------------|
-| Lint pass | ✅ | ✅ |
-| Tests pass | ✅ | ✅ |
-| Coverage ≥ 80% | ✅ | ✅ |
-| Spec consistency | ✅ | ✅ |
-| Security scan pass | ✅ | ✅ |
-| Aprobación manual | ❌ | ✅ |
-
-### Deploy
-
-| Evento | Acción |
-|--------|--------|
-| Merge a `staging` | Deploy automático a entorno staging |
-| Merge a `main` | Deploy automático a producción |
-
----
-
-## Versionado
-
-### Semantic Versioning
-
-Formato: `vMAJOR.MINOR.PATCH`
-
-| Cambio | Incrementa |
-|--------|------------|
-| Breaking change en API | MAJOR |
-| Nueva funcionalidad compatible | MINOR |
-| Bug fix | PATCH |
-
-### Tags
-
-- Crear tag en `main` tras cada release a producción
-- Formato: `v1.0.0`, `v1.1.0`, `v1.1.1`
-- Los hotfixes incrementan PATCH
-
----
-
-## Gestión de Dependencias
-
-### Añadir Dependencia Nueva
-
-1. **Evaluar necesidad**: ¿Es realmente necesaria? ¿Hay alternativa nativa?
-2. **Verificar seguridad**: Comprobar vulnerabilidades conocidas
-3. **Verificar licencia**: Compatible con el proyecto
-4. **Añadir** al archivo de dependencias
-5. **Documentar** en este contrato si es dependencia principal
-6. **Generar SPEC_UPDATE_REQUEST** si modifica arquitectura
-
-### Cuándo Actualizar Este Contrato
-
-| Cambio | Requiere Update |
-|--------|-----------------|
-| Nueva dependencia principal | ✅ |
-| Cambio de versión major de dep principal | ✅ |
-| Eliminar dependencia principal | ✅ |
-| Dependencia de desarrollo | ❌ |
-| Actualización patch/minor | ❌ |
-
----
-
-## Constraints del Proyecto
-
-> Restricciones no negociables que guían todas las decisiones.
-
-| Constraint | Valor | Razón |
-|------------|-------|-------|
-| **Presupuesto cloud mensual** | [Ej: $100] | [Límite del cliente] |
-| **Regulaciones** | [Ej: GDPR] | [Ubicación de usuarios] |
-| **Cloud provider** | [Ej: AWS] | [Infraestructura existente] |
-| **Tiempo de respuesta API** | [Ej: <200ms p95] | [Requisito de UX] |
-
----
-
-## Documentos Relacionados
+## 13. Documentos Relacionados
 
 | Documento | Propósito | Ubicación |
 |-----------|-----------|-----------|
-| DATA_MODELS.md | Especificación de entidades | /specs/DATA_MODELS.md |
-| API Contracts | Contratos OpenAPI | /specs/api_contracts/*.yaml |
-| ARCHITECTURE_DECISIONS.md | Log de decisiones | /specs/ARCHITECTURE_DECISIONS.md |
-| TASK_HISTORY.md | Historial de tareas | /specs/TASK_HISTORY.md |
-| **historico_commits.md** | **Historial detallado de commits** | **/docs/historico_commits.md** |
+| DATA_MODELS.md | Especificación de entidades | /docs/DATA_MODELS.md |
+| API Contracts | Contratos OpenAPI | /docs/api_contracts/*.yaml |
+| ARCHITECTURE_DECISIONS.md | Log de decisiones | /docs/ARCHITECTURE_DECISIONS.md |
+| TASK_HISTORY.md | Historial de tareas | /docs/TASK_HISTORY.md |
+| historico_commits.md | Historial detallado de commits | /docs/historico_commits.md |
 
 ---
 
@@ -589,7 +571,7 @@ Formato: `vMAJOR.MINOR.PATCH`
 
 | Versión | Fecha | Autor | Cambios |
 |---------|-------|-------|---------|
-| 1.0.0 | [Fecha] | architect-agent | Versión inicial |
+| 1.0.0 | 2026-02-02 | architect-agent | Versión inicial |
 | | | | |
 
 ---
