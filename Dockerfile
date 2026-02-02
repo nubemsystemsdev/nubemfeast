@@ -4,13 +4,13 @@
 # ==============================================================================
 
 # Stage 1: Dependencies
-FROM node:20-alpine AS deps
+FROM node:25-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
 # Stage 2: Builder
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -19,7 +19,7 @@ RUN npm run build --if-present
 RUN npm prune --production
 
 # Stage 3: Production
-FROM node:20-alpine AS runner
+FROM node:25-alpine AS runner
 WORKDIR /app
 
 LABEL org.opencontainers.image.source="https://github.com/nubemsystemsdev/[NOMBRE_PROYECTO]"
