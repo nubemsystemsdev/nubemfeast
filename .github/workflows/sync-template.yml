@@ -1,0 +1,125 @@
+# ==============================================================================
+# SYNC FROM TEMPLATE
+# Permite sincronizar manualmente desde el template
+# ==============================================================================
+name: Sync Template
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Modo de sincronización'
+        required: true
+        default: 'safe'
+        type: choice
+        options:
+          - safe    # Solo archivos que no existen
+          - config  # Actualiza workflows y configs
+          - full    # Todo
+
+jobs:
+  sync:
+    name: 🔄 Sync from Template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Checkout template
+        uses: actions/checkout@v4
+        with:
+          repository: nubemsystemsdev/nubem-template
+          path: template
+
+      - name: Sync files
+        run: |
+          MODE="${{ inputs.mode }}"
+          
+          SYNC_ALWAYS=(
+            ".github/workflows/ci.yml"
+            ".github/workflows/cd-staging.yml"
+            ".github/workflows/cd-production.yml"
+            ".github/workflows/security.yml"
+            ".github/workflows/sync-template.yml"
+            ".github/workflows/staging-schedule.yml"
+            ".github/CODEOWNERS"
+            ".github/dependabot.yml"
+            ".github/SECURITY.md"
+            ".editorconfig"
+          )
+          
+          COPY_IF_MISSING=(
+            "docs/CONTRATO_TECNICO.md"
+            "docs/CONTRIBUTING.md"
+            "docs/RUNBOOK.md"
+            ".github/pull_request_template.md"
+            "Dockerfile"
+            "docker-compose.yml"
+            ".dockerignore"
+            ".gitignore"
+            ".nvmrc"
+          )
+          
+          cd repo
+          
+          case "$MODE" in
+            safe)
+              for file in "${COPY_IF_MISSING[@]}"; do
+                if [ ! -e "$file" ] && [ -e "../template/$file" ]; then
+                  mkdir -p "$(dirname "$file")"
+                  cp -r "../template/$file" "$file"
+                  echo "Created: $file"
+                fi
+              done
+              ;;
+            config)
+              for file in "${SYNC_ALWAYS[@]}"; do
+                if [ -e "../template/$file" ]; then
+                  mkdir -p "$(dirname "$file")"
+                  cp -r "../template/$file" "$file"
+                  echo "Updated: $file"
+                fi
+              done
+              for file in "${COPY_IF_MISSING[@]}"; do
+                if [ ! -e "$file" ] && [ -e "../template/$file" ]; then
+                  mkdir -p "$(dirname "$file")"
+                  cp -r "../template/$file" "$file"
+                  echo "Created: $file"
+                fi
+              done
+              ;;
+            full)
+              for file in "${SYNC_ALWAYS[@]}" "${COPY_IF_MISSING[@]}"; do
+                if [ -e "../template/$file" ]; then
+                  mkdir -p "$(dirname "$file")"
+                  cp -r "../template/$file" "$file"
+                  echo "Synced: $file"
+                fi
+              done
+              ;;
+          esac
+          
+          # Replace placeholders
+          REPO_NAME="${{ github.event.repository.name }}"
+          DATE=$(date +%Y-%m-%d)
+          find . -type f \( -name "*.md" -o -name "*.yml" \) \
+            -exec sed -i "s/\[NOMBRE_PROYECTO\]/$REPO_NAME/g" {} \; \
+            -exec sed -i "s/\[FECHA\]/$DATE/g" {} \;
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          path: repo
+          commit-message: "chore: sync from template (${{ inputs.mode }})"
+          branch: chore/sync-template
+          delete-branch: true
+          title: "🔄 Sync from nubem-template"
+          body: |
+            Sincronización desde template.
+            
+            **Modo**: `${{ inputs.mode }}`
+            
+            Revisa los cambios antes de hacer merge.
+          labels: chore

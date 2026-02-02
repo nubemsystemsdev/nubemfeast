@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Preguntas
+    url: https://github.com/nubemsystemsdev/[NOMBRE_PROYECTO]/discussions
+    about: Usa Discussions para preguntas generales
+  - name: 📚 Documentación
+    url: https://github.com/nubemsystemsdev/[NOMBRE_PROYECTO]/tree/main/docs
+    about: Revisa la documentación primero

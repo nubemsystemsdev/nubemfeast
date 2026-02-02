@@ -1,0 +1,17 @@
+# ==============================================================================
+# CODEOWNERS - Nubem Systems
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ==============================================================================
+
+# Default: el team nubemsystems es owner de todo
+* @nubemsystemsdev/nubemsystems
+
+# CI/CD requiere revisión del team
+.github/ @nubemsystemsdev/nubemsystems
+
+# Infraestructura
+Dockerfile @nubemsystemsdev/nubemsystems
+docker-compose*.yml @nubemsystemsdev/nubemsystems
+
+# Documentación crítica
+docs/CONTRATO_TECNICO.md @nubemsystemsdev/nubemsystems
