@@ -1,0 +1,436 @@
+openapi: 3.1.0
+info:
+  title: NubemFeast Navigation API
+  version: 1.0.0
+  description: API para guías de navegación y modelo de mundo
+
+paths:
+  /api/scans/{scan_id}/guide:
+    parameters:
+      - name: scan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Obtener guía de navegación
+      operationId: getGuide
+      tags:
+        - Navigation
+      parameters:
+        - name: wheelchair_profile_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: ID del perfil de silla de ruedas (usa default si no se especifica)
+      responses:
+        '200':
+          description: Guía de navegación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuideResponse'
+        '404':
+          description: Scan no encontrado o análisis no completado
+
+    post:
+      summary: Generar/regenerar guía de navegación
+      operationId: generateGuide
+      tags:
+        - Navigation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuideRequest'
+      responses:
+        '201':
+          description: Guía generada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuideResponse'
+        '400':
+          description: Análisis no completado
+        '404':
+          description: Scan no encontrado
+
+  /api/scans/{scan_id}/world-model:
+    parameters:
+      - name: scan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Obtener modelo de mundo (grafo de espacios)
+      operationId: getWorldModel
+      tags:
+        - Navigation
+      responses:
+        '200':
+          description: Modelo de mundo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorldModelResponse'
+        '404':
+          description: Scan no encontrado o modelo no generado
+
+  /api/wheelchair-profiles:
+    get:
+      summary: Listar perfiles de silla de ruedas
+      operationId: listWheelchairProfiles
+      tags:
+        - Wheelchair Profiles
+      responses:
+        '200':
+          description: Lista de perfiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WheelchairProfileResponse'
+
+    post:
+      summary: Crear perfil personalizado
+      operationId: createWheelchairProfile
+      tags:
+        - Wheelchair Profiles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WheelchairProfileCreate'
+      responses:
+        '201':
+          description: Perfil creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WheelchairProfileResponse'
+
+  /api/wheelchair-profiles/{profile_id}:
+    parameters:
+      - name: profile_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Obtener perfil de silla de ruedas
+      operationId: getWheelchairProfile
+      tags:
+        - Wheelchair Profiles
+      responses:
+        '200':
+          description: Perfil de silla de ruedas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WheelchairProfileResponse'
+        '404':
+          description: Perfil no encontrado
+
+    delete:
+      summary: Eliminar perfil personalizado
+      operationId: deleteWheelchairProfile
+      tags:
+        - Wheelchair Profiles
+      responses:
+        '204':
+          description: Perfil eliminado
+        '400':
+          description: No se puede eliminar perfil predeterminado
+        '404':
+          description: Perfil no encontrado
+
+components:
+  schemas:
+    GuideRequest:
+      type: object
+      properties:
+        wheelchair_profile_id:
+          type: string
+          format: uuid
+          description: ID del perfil de silla de ruedas
+
+    GuideResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        scan_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        summary:
+          type: string
+        accessibility_score:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+        navigation_steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationStep'
+        critical_alerts:
+          type: array
+          items:
+            type: string
+        wheelchair_profile:
+          $ref: '#/components/schemas/WheelchairProfileResponse'
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    NavigationStep:
+      type: object
+      properties:
+        step_number:
+          type: integer
+        image_id:
+          type: string
+          format: uuid
+        image_url:
+          type: string
+          format: uri
+        title:
+          type: string
+        description:
+          type: string
+        barriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/BarrierSummary'
+        alerts:
+          type: array
+          items:
+            type: string
+        recommendations:
+          type: array
+          items:
+            type: string
+        accessibility_rating:
+          type: string
+          enum:
+            - accessible
+            - caution
+            - difficult
+            - inaccessible
+
+    BarrierSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        barrier_type:
+          type: string
+        severity:
+          type: string
+        description:
+          type: string
+        recommendation:
+          type: string
+          nullable: true
+
+    WorldModelResponse:
+      type: object
+      properties:
+        scan_id:
+          type: string
+          format: uuid
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorldModelNode'
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorldModelEdge'
+        recommended_path:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Lista ordenada de node IDs para la ruta recomendada
+
+    WorldModelNode:
+      type: object
+      properties:
+        id:
+          type: string
+        image_id:
+          type: string
+          format: uuid
+        image_url:
+          type: string
+          format: uri
+        label:
+          type: string
+        space_type:
+          type: string
+          enum:
+            - entrance
+            - corridor
+            - room
+            - stairway
+            - elevator
+            - bathroom
+            - outdoor
+            - parking
+            - other
+        barriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/BarrierSummary'
+        accessibility_score:
+          type: number
+          minimum: 0
+          maximum: 100
+        features:
+          type: object
+          properties:
+            has_ramp:
+              type: boolean
+            has_handrails:
+              type: boolean
+            has_elevator:
+              type: boolean
+            lighting:
+              type: string
+              enum:
+                - poor
+                - adequate
+                - good
+            floor_type:
+              type: string
+
+    WorldModelEdge:
+      type: object
+      properties:
+        source:
+          type: string
+          description: Source node ID
+        target:
+          type: string
+          description: Target node ID
+        traversable:
+          type: boolean
+        difficulty:
+          type: string
+          enum:
+            - easy
+            - moderate
+            - difficult
+            - impassable
+        barriers_in_path:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: IDs de barreras en esta transición
+        distance_estimate:
+          type: string
+          enum:
+            - short
+            - medium
+            - long
+        notes:
+          type: string
+          nullable: true
+
+    WheelchairType:
+      type: string
+      enum:
+        - manual
+        - electric
+        - sport
+        - pediatric
+        - bariatric
+
+    WheelchairProfileCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+        width_cm:
+          type: number
+          exclusiveMinimum: 0
+        length_cm:
+          type: number
+          exclusiveMinimum: 0
+        min_door_width_cm:
+          type: number
+          exclusiveMinimum: 0
+        max_step_height_cm:
+          type: number
+          minimum: 0
+          default: 2
+        max_slope_percent:
+          type: number
+          minimum: 0
+          default: 8
+        can_handle_gravel:
+          type: boolean
+          default: false
+        can_handle_grass:
+          type: boolean
+          default: false
+        wheelchair_type:
+          $ref: '#/components/schemas/WheelchairType'
+          default: manual
+      required:
+        - name
+        - width_cm
+        - length_cm
+        - min_door_width_cm
+
+    WheelchairProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        width_cm:
+          type: number
+        length_cm:
+          type: number
+        min_door_width_cm:
+          type: number
+        max_step_height_cm:
+          type: number
+        max_slope_percent:
+          type: number
+        can_handle_gravel:
+          type: boolean
+        can_handle_grass:
+          type: boolean
+        wheelchair_type:
+          $ref: '#/components/schemas/WheelchairType'
+        is_default:
+          type: boolean

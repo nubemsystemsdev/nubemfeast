@@ -1,0 +1,402 @@
+openapi: 3.1.0
+info:
+  title: NubemFeast Scans API
+  version: 1.0.0
+  description: API para gestión de escaneos de espacios
+
+paths:
+  /api/scans:
+    get:
+      summary: Listar scans
+      operationId: listScans
+      tags:
+        - Scans
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ScanStatus'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Lista de scans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScanResponse'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+
+    post:
+      summary: Crear nuevo scan
+      operationId: createScan
+      tags:
+        - Scans
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanCreate'
+      responses:
+        '201':
+          description: Scan creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResponse'
+        '422':
+          description: Error de validación
+
+  /api/scans/{scan_id}:
+    parameters:
+      - name: scan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Obtener scan por ID
+      operationId: getScan
+      tags:
+        - Scans
+      responses:
+        '200':
+          description: Detalle del scan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanDetailResponse'
+        '404':
+          description: Scan no encontrado
+
+    patch:
+      summary: Actualizar scan
+      operationId: updateScan
+      tags:
+        - Scans
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScanUpdate'
+      responses:
+        '200':
+          description: Scan actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScanResponse'
+        '404':
+          description: Scan no encontrado
+
+    delete:
+      summary: Eliminar scan
+      operationId: deleteScan
+      tags:
+        - Scans
+      responses:
+        '204':
+          description: Scan eliminado
+        '404':
+          description: Scan no encontrado
+
+  /api/scans/{scan_id}/images:
+    parameters:
+      - name: scan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      summary: Listar imágenes de un scan
+      operationId: listScanImages
+      tags:
+        - Scans
+        - Images
+      responses:
+        '200':
+          description: Lista de imágenes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageResponse'
+
+    post:
+      summary: Subir imágenes a un scan
+      operationId: uploadImages
+      tags:
+        - Scans
+        - Images
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  maxItems: 20
+              required:
+                - files
+      responses:
+        '201':
+          description: Imágenes subidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageUploadResponse'
+        '400':
+          description: Error en upload
+        '404':
+          description: Scan no encontrado
+
+  /api/scans/{scan_id}/images/{image_id}:
+    parameters:
+      - name: scan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: image_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    delete:
+      summary: Eliminar imagen
+      operationId: deleteImage
+      tags:
+        - Images
+      responses:
+        '204':
+          description: Imagen eliminada
+        '404':
+          description: Imagen no encontrada
+
+  /api/scans/{scan_id}/images/reorder:
+    parameters:
+      - name: scan_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    post:
+      summary: Reordenar imágenes
+      operationId: reorderImages
+      tags:
+        - Images
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: IDs de imágenes en el nuevo orden
+              required:
+                - image_ids
+      responses:
+        '200':
+          description: Imágenes reordenadas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImageResponse'
+
+components:
+  schemas:
+    ScanStatus:
+      type: string
+      enum:
+        - pending
+        - uploading
+        - ready
+        - analyzing
+        - completed
+        - failed
+
+    ScanCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+        location:
+          type: string
+          maxLength: 500
+      required:
+        - name
+
+    ScanUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 1000
+        location:
+          type: string
+          maxLength: 500
+
+    ScanResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/ScanStatus'
+        image_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - status
+        - image_count
+        - created_at
+        - updated_at
+
+    ScanDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/ScanResponse'
+        - type: object
+          properties:
+            images:
+              type: array
+              items:
+                $ref: '#/components/schemas/ImageResponse'
+            analysis_result:
+              $ref: '#/components/schemas/AnalysisResultSummary'
+              nullable: true
+            has_guide:
+              type: boolean
+
+    ImageResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        original_filename:
+          type: string
+        file_size:
+          type: integer
+        mime_type:
+          type: string
+        width:
+          type: integer
+          nullable: true
+        height:
+          type: integer
+          nullable: true
+        sequence_order:
+          type: integer
+        user_description:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        barrier_count:
+          type: integer
+        url:
+          type: string
+          format: uri
+
+    ImageUploadResponse:
+      type: object
+      properties:
+        uploaded:
+          type: integer
+        failed:
+          type: integer
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageResponse'
+        errors:
+          type: array
+          items:
+            type: string
+
+    AnalysisResultSummary:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - pending
+            - in_progress
+            - completed
+            - failed
+        total_barriers_found:
+          type: integer
+        accessibility_score:
+          type: number
+          nullable: true
